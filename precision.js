@@ -6,6 +6,13 @@ Follow me on twitter for more: https://twitter.com/HunorBorbely
 
 */
 
+// inputs
+
+var closest;
+
+const ajusteEl = document.getElementById("ajuste1");
+
+
 Math.minmax = (value, limit) => {
   return Math.max(Math.min(value, limit), -limit);
 };
@@ -471,17 +478,18 @@ function main(timestamp) {
                     console.warn("too close h head", distance, ball);
 
                   // Ball hits the left cap of a horizontal wall
-                  const closest = closestItCanBe(wallStart, {
-                    x: ball.nextX,
+                  closest = closestItCanBe(wallStart, {
+                    x: ball.nextX, 
                     y: ball.nextY
                   });
+                  console.log(ajusteEl.value);
+                  
                   const rolled = rollAroundCap(wallStart, {
                     x: closest.x,
                     y: closest.y,
                     velocityX: ball.velocityX,
                     velocityY: ball.velocityY
                   });
-
                   Object.assign(ball, rolled);
                 }
               }
