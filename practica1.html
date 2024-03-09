@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body{
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    #container {
+        width: 500px;
+        height: 500px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f2f2f2;
+        position: relative;
+    }
+</style>
+
+<body>
+    <div id="container"></div>
+    <script>
+        const containerEl = document.getElementById('container');
+        const random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+        const numberParticle = 7;
+        let wall, ball;
+        let balls = [];
+        let ballEl = [];
+        const ballSize = 50;
+        const directions = [];
+        for (let i = 0; i < numberParticle; i++) {
+            directions.push({ x: random(-1, 1), y: random(-1, 1) });
+        }
+        const randomMoveX = () => random(0, 500 - ballSize)
+        const randomMoveY = () => random(0, 500 - ballSize)
+
+        function createBall() {
+            ball = document.createElement('div');
+            ball.x = undefined;
+            ball.y = undefined;
+            do {
+                ball.x = randomMoveX();
+                ball.y = randomMoveY();
+            } while (isOverlap(ball.x, ball.y, ballSize));
+            ball.style.cssText = `
+                width: ${ballSize}px;
+                height: ${ballSize}px;
+                background-color: #f00;
+                border-radius: 50%;
+                position: absolute;
+                top: ${ball.y}px;
+                left: ${ball.x}px;
+            `;
+            containerEl.appendChild(ball);
+            ballEl.push(ball)
+        }
+        function createWall() {
+            wall = document.createElement('div');
+            wall.style.cssText = `
+                position: absolute;
+                width: 10px;
+                height: 100px;
+                background-color: #000;
+                top: 200px;
+                left: 200px;
+            `;
+            containerEl.appendChild(wall);
+        }
+        function isOverlap(left, top, size) {
+            const balls = containerEl.querySelectorAll('div');
+            createWall();
+            const wallRect = wall.getBoundingClientRect();
+            if (left < wallRect.left + wallRect.width && left + size > wallRect.left && top < wallRect.top + wallRect.height && top + size > wallRect.top) {
+                return true;
+            }
+            for (let i = 0; i < balls.length; i++) {
+                const ball = balls[i];
+                if (ball !== this) {
+                    const rect = ball.getBoundingClientRect();
+                    if (left < rect.left + rect.width && left + size > rect.left && top < rect.top + rect.height && top + size > rect.top) {
+                        return true;
+                    }
+                }
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            for (let i = 0; i < numberParticle; i++) {
+                createBall();
+            }
+            createWall();
+        });
+        function moveBall() {
+            const containerRect = containerEl.getBoundingClientRect();
+            const wallRect = wall.getBoundingClientRect();
+            for (let i = 0; i < ballEl.length; i++) {
+                const ball = ballEl[i];
+                ball.x += directions[i].x;
+                ball.y += directions[i].y;
+                // Si la bola ha alcanzado el borde del contenedor, invertir la dirección del movimiento
+                if (ball.x + ballSize > containerRect.right || ball.x < containerRect.left) {
+                    directions[i].x = -directions[i].x;
+                }
+                if (ball.y + ballSize > containerRect.bottom || ball.y < containerRect.top) {
+                    directions[i].y = -directions[i].y;
+                }
+                if (ball.x < wallRect.left + wallRect.width && ball.x + ballSize > wallRect.left && ball.y < wallRect.top + wallRect.height && ball.y + ballSize > wallRect.top) {
+                    directions[i].x = -directions[i].x;
+                    directions[i].y = -directions[i].y;
+                }
+                ball.style.left = ball.x + 'px';
+                ball.style.top = ball.y + 'px';
+            }
+        }
+        setInterval(moveBall, 10);
+    </script>
+</body>
+
+</html>
